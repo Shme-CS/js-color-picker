@@ -118,6 +118,9 @@ h1 {
 /* Color Display Section */
 .color-display-section {
     margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .color-code-container {
