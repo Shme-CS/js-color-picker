@@ -7,6 +7,8 @@
 const colorPicker = document.getElementById('colorPicker');
 const colorPreview = document.getElementById('colorPreview');
 const hexValue = document.getElementById('hexValue');
+const rgbValue = document.getElementById('rgbValue');
+const hslValue = document.getElementById('hslValue');
 const copyBtn = document.getElementById('copyBtn');
 
 /**
@@ -19,6 +21,78 @@ function updateColor(color) {
     
     // Update HEX value display
     hexValue.value = color.toUpperCase();
+    
+    // Convert and display RGB
+    const rgb = hexToRgb(color);
+    rgbValue.value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+    
+    // Convert and display HSL
+    const hsl = hexToHsl(color);
+    hslValue.value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+}
+
+/**
+ * Convert HEX color to RGB
+ * @param {string} hex - HEX color code
+ * @returns {Object} RGB values {r, g, b}
+ */
+function hexToRgb(hex) {
+    // Remove # if present
+    hex = hex.replace('#', '');
+    
+    // Parse hex values
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    return { r, g, b };
+}
+
+/**
+ * Convert HEX color to HSL
+ * @param {string} hex - HEX color code
+ * @returns {Object} HSL values {h, s, l}
+ */
+function hexToHsl(hex) {
+    // First convert to RGB
+    const rgb = hexToRgb(hex);
+    
+    // Convert RGB to 0-1 range
+    const r = rgb.r / 255;
+    const g = rgb.g / 255;
+    const b = rgb.b / 255;
+    
+    // Find min and max values
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+    
+    let h = 0;
+    let s = 0;
+    let l = (max + min) / 2;
+    
+    // Calculate hue
+    if (delta !== 0) {
+        if (max === r) {
+            h = ((g - b) / delta + (g < b ? 6 : 0)) / 6;
+        } else if (max === g) {
+            h = ((b - r) / delta + 2) / 6;
+        } else {
+            h = ((r - g) / delta + 4) / 6;
+        }
+    }
+    
+    // Calculate saturation
+    if (delta !== 0) {
+        s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+    }
+    
+    // Convert to degrees and percentages
+    h = Math.round(h * 360);
+    s = Math.round(s * 100);
+    l = Math.round(l * 100);
+    
+    return { h, s, l };
 }
 
 /**
