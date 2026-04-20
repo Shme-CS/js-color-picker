@@ -10,6 +10,33 @@
     <div class="container">
         <h1>Color Picker Tool</h1>
         <p class="description">Pick and explore colors with ease</p>
+
+        <!-- Color Preview Section -->
+        <div class="color-preview-section">
+            <div class="color-preview" id="colorPreview">
+                <span class="preview-label">Preview</span>
+            </div>
+        </div>
+
+        <!-- Color Picker Input -->
+        <div class="picker-section">
+            <label for="colorPicker" class="picker-label">Choose a Color</label>
+            <input type="color" id="colorPicker" class="color-input" value="#667eea">
+        </div>
+
+        <!-- Color Display Section -->
+        <div class="color-display-section">
+            <div class="color-code-container">
+                <label class="code-label">HEX Color Code</label>
+                <div class="code-display">
+                    <input type="text" id="hexValue" class="hex-input" value="#667eea" readonly>
+                    <button class="copy-btn" id="copyBtn">
+                        <span class="btn-icon">📋</span>
+                        Copy
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="js/script.js"></script>
