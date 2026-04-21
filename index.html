@@ -22,6 +22,18 @@
         <div class="picker-section">
             <label for="colorPicker" class="picker-label">Choose a Color</label>
             <input type="color" id="colorPicker" class="color-input" value="#667eea">
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-random" id="randomBtn">
+                    <span class="btn-icon">🎲</span>
+                    Random Color
+                </button>
+                <button class="btn btn-save" id="saveBtn">
+                    <span class="btn-icon">💾</span>
+                    Save to Palette
+                </button>
+            </div>
         </div>
 
         <!-- Color Display Section -->
@@ -51,6 +63,20 @@
                 <div class="code-display">
                     <input type="text" id="hslValue" class="hex-input" value="hsl(229, 76%, 66%)" readonly>
                 </div>
+            </div>
+        </div>
+
+        <!-- Saved Palette Section -->
+        <div class="palette-section">
+            <div class="palette-header">
+                <h2>Saved Palette</h2>
+                <button class="btn btn-clear" id="clearPaletteBtn">
+                    <span class="btn-icon">🗑️</span>
+                    Clear All
+                </button>
+            </div>
+            <div class="palette-grid" id="paletteGrid">
+                <p class="no-colors">No colors saved yet. Click "Save to Palette" to add colors!</p>
             </div>
         </div>
     </div>
