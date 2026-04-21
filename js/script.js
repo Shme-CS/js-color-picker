@@ -10,6 +10,13 @@ const hexValue = document.getElementById('hexValue');
 const rgbValue = document.getElementById('rgbValue');
 const hslValue = document.getElementById('hslValue');
 const copyBtn = document.getElementById('copyBtn');
+const randomBtn = document.getElementById('randomBtn');
+const saveBtn = document.getElementById('saveBtn');
+const clearPaletteBtn = document.getElementById('clearPaletteBtn');
+const paletteGrid = document.getElementById('paletteGrid');
+
+// Palette storage key
+const PALETTE_KEY = 'colorPickerPalette';
 
 /**
  * Update the color preview and HEX display
@@ -160,6 +167,159 @@ function showCopyFeedback(success) {
     }, 2000);
 }
 
+/**
+ * Generate a random HEX color
+ * @returns {string} Random HEX color code
+ */
+function generateRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    
+    return color;
+}
+
+/**
+ * Handle random color button click
+ */
+function handleRandomColor() {
+    const randomColor = generateRandomColor();
+    colorPicker.value = randomColor;
+    updateColor(randomColor);
+}
+
+/**
+ * Load saved palette from localStorage
+ * @returns {Array} Array of saved color HEX codes
+ */
+function loadPalette() {
+    const saved = localStorage.getItem(PALETTE_KEY);
+    return saved ? JSON.parse(saved) : [];
+}
+
+/**
+ * Save palette to localStorage
+ * @param {Array} palette - Array of color HEX codes
+ */
+function savePalette(palette) {
+    localStorage.setItem(PALETTE_KEY, JSON.stringify(palette));
+}
+
+/**
+ * Add current color to palette
+ */
+function addColorToPalette() {
+    const currentColor = hexValue.value;
+    let palette = loadPalette();
+    
+    // Check if color already exists
+    if (palette.includes(currentColor)) {
+        showSaveFeedback(false, 'Already saved!');
+        return;
+    }
+    
+    // Add color to palette
+    palette.push(currentColor);
+    savePalette(palette);
+    
+    // Update display
+    displayPalette();
+    showSaveFeedback(true, 'Saved!');
+}
+
+/**
+ * Show feedback for save action
+ * @param {boolean} success - Whether save was successful
+ * @param {string} message - Message to display
+ */
+function showSaveFeedback(success, message) {
+    const originalText = saveBtn.innerHTML;
+    
+    if (success) {
+        saveBtn.innerHTML = `<span class="btn-icon">✓</span> ${message}`;
+        saveBtn.style.background = 'linear-gradient(135deg, #51cf66 0%, #37b24d 100%)';
+    } else {
+        saveBtn.innerHTML = `<span class="btn-icon">⚠</span> ${message}`;
+        saveBtn.style.background = 'linear-gradient(135deg, #ffa94d 0%, #ff922b 100%)';
+    }
+    
+    // Reset button after 2 seconds
+    setTimeout(() => {
+        saveBtn.innerHTML = originalText;
+        saveBtn.style.background = '';
+    }, 2000);
+}
+
+/**
+ * Display saved palette colors
+ */
+function displayPalette() {
+    const palette = loadPalette();
+    
+    if (palette.length === 0) {
+        paletteGrid.innerHTML = '<p class="no-colors">No colors saved yet. Click "Save to Palette" to add colors!</p>';
+        return;
+    }
+    
+    paletteGrid.innerHTML = '';
+    
+    palette.forEach((color, index) => {
+        const swatch = document.createElement('div');
+        swatch.className = 'color-swatch';
+        swatch.style.backgroundColor = color;
+        swatch.title = `Click to use ${color}`;
+        
+        // Add color label
+        const label = document.createElement('div');
+        label.className = 'color-swatch-label';
+        label.textContent = color;
+        
+        // Add delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'color-swatch-delete';
+        deleteBtn.innerHTML = '×';
+        deleteBtn.title = 'Remove color';
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            removeColorFromPalette(index);
+        };
+        
+        // Click to use color
+        swatch.onclick = () => {
+            colorPicker.value = color;
+            updateColor(color);
+        };
+        
+        swatch.appendChild(label);
+        swatch.appendChild(deleteBtn);
+        paletteGrid.appendChild(swatch);
+    });
+}
+
+/**
+ * Remove color from palette
+ * @param {number} index - Index of color to remove
+ */
+function removeColorFromPalette(index) {
+    let palette = loadPalette();
+    palette.splice(index, 1);
+    savePalette(palette);
+    displayPalette();
+}
+
+/**
+ * Clear entire palette
+ */
+function clearPalette() {
+    if (confirm('Are you sure you want to clear all saved colors?')) {
+        localStorage.removeItem(PALETTE_KEY);
+        displayPalette();
+    }
+}
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Color Picker Tool initialized');
@@ -168,9 +328,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const initialColor = colorPicker.value;
     updateColor(initialColor);
     
+    // Load and display saved palette
+    displayPalette();
+    
     // Add event listener for color changes
     colorPicker.addEventListener('input', handleColorChange);
     
     // Add event listener for copy button
     copyBtn.addEventListener('click', copyToClipboard);
+    
+    // Add event listener for random color button
+    randomBtn.addEventListener('click', handleRandomColor);
+    
+    // Add event listener for save button
+    saveBtn.addEventListener('click', addColorToPalette);
+    
+    // Add event listener for clear palette button
+    clearPaletteBtn.addEventListener('click', clearPalette);
 });
